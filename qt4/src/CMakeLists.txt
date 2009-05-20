@@ -6,6 +6,11 @@ include_directories(
   ${CMAKE_CURRENT_BINARY_DIR}
 )
 
+if (HAVE_CAIRO)
+  include_directories(${CAIRO_INCLUDE_DIRS})
+  add_definitions(${CAIRO_CFLAGS})
+endif (HAVE_CAIRO)
+
 set(poppler_qt4_SRCS
   poppler-annotation.cc
   poppler-document.cc
@@ -28,10 +33,20 @@ set(poppler_qt4_SRCS
   poppler-media.cc
   ArthurOutputDev.cc
 )
+if (HAVE_CAIRO)
+  set(poppler_qt4_SRCS ${poppler_qt4_SRCS}
+    ${CMAKE_SOURCE_DIR}/poppler/CairoOutputDev.cc
+    ${CMAKE_SOURCE_DIR}/poppler/CairoRescaleBox.cc
+    ${CMAKE_SOURCE_DIR}/poppler/CairoFontEngine.cc
+  )
+endif(HAVE_CAIRO)
 qt4_automoc(${poppler_qt4_SRCS})
 add_library(poppler-qt4 SHARED ${poppler_qt4_SRCS})
 set_target_properties(poppler-qt4 PROPERTIES VERSION 4.3.0 SOVERSION 4)
 target_link_libraries(poppler-qt4 poppler ${QT4_QTCORE_LIBRARY} ${QT4_QTGUI_LIBRARY} ${QT4_QTXML_LIBRARY})
+if (HAVE_CAIRO)
+  target_link_libraries(poppler-qt4 ${CAIRO_LIBRARIES})
+endif (HAVE_CAIRO)
 if(MSVC)
 target_link_libraries(poppler-qt4 poppler ${poppler_LIBS})
 endif(MSVC)
