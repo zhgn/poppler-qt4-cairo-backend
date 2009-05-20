@@ -200,6 +200,13 @@ void CairoOutputDev::setCairo(cairo_t *cairo)
   }
   if (cairo != NULL) {
     this->cairo = cairo_reference (cairo);
+    {
+      cairo_font_options_t *options = cairo_font_options_create ();
+      cairo_get_font_options (cairo, options);
+      cairo_font_options_set_antialias (options, CAIRO_ANTIALIAS_SUBPIXEL);
+      cairo_set_font_options (cairo, options);
+      cairo_font_options_destroy (options);
+    }
 	/* save the initial matrix so that we can use it for type3 fonts. */
 	//XXX: is this sufficient? could we miss changes to the matrix somehow?
 	cairo_get_matrix(cairo, &orig_matrix);
